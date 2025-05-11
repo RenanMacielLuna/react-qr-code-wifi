@@ -3,22 +3,22 @@ import { Button, Form, Alert } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 
 function Wifi({ setQrText }) {
-  const [campoSenhaDesabilitada, setCampoSenhaDesabilitada] = useState(true);
-  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [fieldDisablePassword, setFieldDisablePassword] = useState(true);
+  const [showPassowrd, setShowPassowrd] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [autenticacao, setAutenticacao] = useState('nopass');
+  const [authentication, setAuthentication] = useState('nopass');
   const [ssid, setSsid] = useState('');
-  const [senha, setSenha] = useState('');
-  const [oculta, setOculta] = useState(false);
-  const [conteudoBotao, setConteudoBotao] = useState('Mostrar Senha');
+  const [password, setPassword] = useState('');
+  const [hidden, setHidden] = useState(false);
+  const [buttonContent, setButtonContent] = useState('Show Password');
   const { register, handleSubmit } = useForm();
-  const autenticacoes = [
+  const authentications = [
     {
-      valor: 'nopass',
-      nome: 'Sem Senha',
+      value: 'nopass',
+      name: 'No Password',
     },
-    { valor: 'WEP', nome: 'WEP' },
-    { valor: 'WPA', nome: 'WPA' },
+    { value: 'WEP', name: 'WEP' },
+    { value: 'WPA', name: 'WPA' },
   ];
 
   const onSubmit = (data) => {
@@ -27,101 +27,101 @@ function Wifi({ setQrText }) {
     } else {
       setIsError(false);
       setQrText(
-        `WIFI:T:${data.autenticacao};S:${data.ssid};${
-          data.autenticacao !== 'nopass' ? `P:${data.senha};` : ''
-        }H:${data.oculta};`,
+        `WIFI:T:${data.authentication};S:${data.ssid};${
+          data.authentication !== 'nopass' ? `P:${data.password};` : ''
+        }H:${data.hidden};`
       );
     }
   };
 
-  const desabilitarHabilitarCampoSenha = (autenticacao) => {
-    setSenha('');
+  const desabilitarHabilitarCampoPassword = (authentication) => {
+    setPassword('');
     setSsid('');
-    setOculta(false);
+    setHidden(false);
     setIsError(false);
-    if (autenticacao === 'nopass') {
-      setCampoSenhaDesabilitada(true);
+    if (authentication === 'nopass') {
+      setFieldDisablePassword(true);
     } else {
-      setCampoSenhaDesabilitada(false);
+      setFieldDisablePassword(false);
     }
   };
 
-  const mostrarEsconderSenha = () => {
-    setMostrarSenha(!mostrarSenha);
-    if (!mostrarSenha) {
-      setConteudoBotao('Esconder Senha');
+  const showHidePassword = () => {
+    setShowPassowrd(!showPassowrd);
+    if (!showPassowrd) {
+      setButtonContent('Hide Password');
     } else {
-      setConteudoBotao('Mostrar Senha');
+      setButtonContent('Show Password');
     }
   };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Form.Group className='mb-3'>
+      <Form.Group className="mb-3">
         <Form.Select
-          {...register('autenticacao')}
-          value={autenticacao}
-          aria-label='Autenticação'
+          {...register('authentication')}
+          value={authentication}
+          aria-label="Autenticação"
           onChange={(e) => {
-            setAutenticacao(e.target.value);
-            desabilitarHabilitarCampoSenha(e.target.value);
+            setAuthentication(e.target.value);
+            desabilitarHabilitarCampoPassword(e.target.value);
           }}
         >
-          {autenticacoes.map((autenticacao, index) => {
+          {authentications.map((authentication, index) => {
             return (
-              <option key={index} value={autenticacao.valor}>
-                {autenticacao.nome}
+              <option key={index} value={authentication.value}>
+                {authentication.name}
               </option>
             );
           })}
         </Form.Select>
       </Form.Group>
 
-      <Form.Group className='mb-3'>
-        <Form.Label>Nome da Rede (SSID)</Form.Label>
+      <Form.Group className="mb-3">
+        <Form.Label>Wi-fi Network Name (SSID)</Form.Label>
         <Form.Control
           {...register('ssid')}
-          type='text'
+          type="text"
           value={ssid}
           onChange={(e) => setSsid(e.target.value)}
         ></Form.Control>
         {isError ? (
-          <Alert variant='danger'>Por favor, digite o nome da rede Wi-Fi</Alert>
+          <Alert variant="danger">Please, type the Wi-Fi SSID</Alert>
         ) : (
           false
         )}
       </Form.Group>
 
-      <Form.Group className='mb-3'>
-        <Form.Label>Senha da Rede (Opcional)</Form.Label>
+      <Form.Group className="mb-3">
+        <Form.Label>Network's Password (Optional)</Form.Label>
         <Form.Control
-          disabled={campoSenhaDesabilitada}
-          {...register('senha')}
-          type={mostrarSenha ? 'text' : 'password'}
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          disabled={fieldDisablePassword}
+          {...register('password')}
+          type={showPassowrd ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         ></Form.Control>
-        {autenticacao !== 'nopass' ? (
-          <Button variant='primary' onClick={mostrarEsconderSenha}>
-            {conteudoBotao}
+        {authentication !== 'nopass' ? (
+          <Button variant="primary" onClick={showHidePassword}>
+            {buttonContent}
           </Button>
         ) : (
           false
         )}
       </Form.Group>
 
-      <Form.Group className='mb-3'>
-        <Form.Label>Rede Oculta?</Form.Label>
+      <Form.Group className="mb-3">
+        <Form.Label>Hidden Network?</Form.Label>
         <Form.Check
-          {...register('oculta')}
+          {...register('hidden')}
           type={'checkbox'}
-          checked={oculta}
-          onChange={(e) => setOculta(e.target.checked)}
+          checked={hidden}
+          onChange={(e) => setHidden(e.target.checked)}
         />
       </Form.Group>
 
-      <Button variant='primary' type='submit'>
-        Gerar QR Code
+      <Button variant="primary" type="submit">
+        Generate QR Code
       </Button>
     </Form>
   );
